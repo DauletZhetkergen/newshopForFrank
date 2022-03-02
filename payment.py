@@ -6,7 +6,7 @@ import json
 
 
 # API = 'HF36K9W-KJXMJER-H7MG208-ENZPV9M'
-TOKEN = "1401709439:AAF1G1VbZKEWg8sVs3OcBQ8hL0GeAsePBuY"
+TOKEN = "5112615717:AAGx3uwg6kvT7kZF9bVU2ZbuUi4S2zWj3lY"
 
 
 def get_usd_to_btc(amount):
