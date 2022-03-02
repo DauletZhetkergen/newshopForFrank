@@ -191,7 +191,7 @@ async def check_payment(pid):
     return markup
 
 
-@dp.message_handler(commands=['start', 'help', 'menu'])
+@dp.message_handler(commands=['start', 'menu'])
 @dp.message_handler(lambda message: message.text == "Menu🏠",state='*')
 async def send_welcome(message: types.Message, state: FSMContext):
     await state.reset_state()
