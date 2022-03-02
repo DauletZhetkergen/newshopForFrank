@@ -680,8 +680,9 @@ async def add_item(message: types.Message):
     excel = generate_excel_orders()
     await message.answer_document(open(excel, 'rb'))
 
-@dp.message_handler(commands=['help'])
-async def add_item(message: types.Message):
+@dp.message_handler(commands=['help'],state='*')
+async def help(message: types.Message,state: FSMContext):
+    await state.reset_state()
     if message.from_user.id in admin:
         await message.answer("""/add_item_digital add item to section Digital
         /delet_item deletes item from shop, be careful deletes all codes
