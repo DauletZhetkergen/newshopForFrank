@@ -20,6 +20,7 @@ import asyncio
 from payment import get_payment_btc, check_status_payment, get_payment_eth,random_with_N_digits
 
 TOKEN = "5112615717:AAGx3uwg6kvT7kZF9bVU2ZbuUi4S2zWj3lY"
+
 conn = sqlite3.connect("database.db", check_same_thread=False)
 cursor = conn.cursor()
 
@@ -191,7 +192,7 @@ async def check_payment(pid):
 
 
 @dp.message_handler(commands=['start', 'help', 'menu'])
-@dp.message_handler(lambda message: message.text == "Menu🏠")
+@dp.message_handler(lambda message: message.text == "Menu🏠",state='*')
 async def send_welcome(message: types.Message, state: FSMContext):
     cursor.execute("SELECT * FROM users_data where user_id=?",(message.from_user.id,))
     if cursor.fetchall():
