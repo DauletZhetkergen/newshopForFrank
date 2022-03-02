@@ -194,6 +194,7 @@ async def check_payment(pid):
 @dp.message_handler(commands=['start', 'help', 'menu'])
 @dp.message_handler(lambda message: message.text == "Menu🏠",state='*')
 async def send_welcome(message: types.Message, state: FSMContext):
+    await state.reset_state()
     cursor.execute("SELECT * FROM users_data where user_id=?",(message.from_user.id,))
     if cursor.fetchall():
         await message.answer("""WELCOME TO SCAMILY VALUES,<b>{}</b>!
