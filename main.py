@@ -19,6 +19,7 @@ from aiogram.types.input_file import InputFile
 import asyncio
 from payment import get_payment_btc, check_status_payment, get_payment_eth,random_with_N_digits
 
+# TOKEN = "1401709439:AAF1G1VbZKEWg8sVs3OcBQ8hL0GeAsePBuY"
 TOKEN = "5112615717:AAGx3uwg6kvT7kZF9bVU2ZbuUi4S2zWj3lY"
 
 conn = sqlite3.connect("database.db", check_same_thread=False)
@@ -140,8 +141,9 @@ async def choose_category_digital():
     return markup
 
 async def choose_category_physical():
-    cursor.execute("SELECT DISTINCT CATEGORY FROM physical_items")
+    cursor.execute("SELECT DISTINCT category FROM physical_items")
     results = cursor.fetchall()
+    print(results)
     markup = InlineKeyboardMarkup()
     for i in results:
         markup.add(InlineKeyboardButton(text=i[0], callback_data=category_physical.new(category=i[0])))
@@ -161,9 +163,24 @@ async def products_keyboard_physical(category):
     print(category)
     cursor.execute("SELECT * FROM physical_items WHERE category=?", (category,))
     results = cursor.fetchall()
-    markup = InlineKeyboardMarkup()
-    for i in results:
-        markup.add(InlineKeyboardButton(text=i[3], callback_data=products_p.new(products=i[2])))
+    markup = InlineKeyboardMarkup(row_width=3)
+    i=0
+    if category == "Driver License":
+        i=0
+        while i < 48:
+            first = InlineKeyboardButton(text=results[i][3],callback_data=products_p.new(products=results[i][2]))
+            second = InlineKeyboardButton(text=results[i+1][3],callback_data=products_p.new(products=results[i+1][2]))
+            third = InlineKeyboardButton(text=results[i+2][3],callback_data=products_p.new(products=results[i+2][2]))
+            markup.row(first,second,third)
+            i+=3
+        markup.row(InlineKeyboardButton(text=results[-2][3],callback_data=products_p.new(results[-2][2])),InlineKeyboardButton(text=results[-1][3],callback_data=products_p.new(results[-1][2])))
+        return markup
+
+
+
+    else:
+        for i in results:
+            markup.add(InlineKeyboardButton(text=i[3], callback_data=products_p.new(products=i[2])))
     return markup
 
 async def category_keyboard():
@@ -242,6 +259,12 @@ async def show_catalog(message: types.Message,state:FSMContext):
     await message.answer("Canceled")
     await message.answer("Welcome to our shop,{}".format(message.from_user.first_name),
                          reply_markup=await menu_keyboard())
+
+
+@dp.message_handler(lambda message: message.text == "Support🆘",state='*')
+async def show_catalog(message: types.Message,state:FSMContext):
+    await state.reset_state()
+    await message.answer("Our support: {}".format('@FrankLucas101'))
 
 
 @dp.message_handler(lambda message: message.text == "Products🧺",state='*')
@@ -327,8 +350,14 @@ async def show_products(call: types.CallbackQuery, callback_data: dict):
 async def show_product(call: types.CallbackQuery, callback_data: dict):
     cursor.execute("SELECT * FROM physical_items where item_id =?", (callback_data.get('products'),))
     res = cursor.fetchall()
-    img = InputFile('media/{}'.format(res[0][5]))
-    await call.message.answer_photo(img,'Do you want buy a {} for {}$'.format(res[0][3],res[0][4]),reply_markup=await accept_buying((callback_data.get('products'))))
+    dir = res[0][5]
+    if len(dir)<2:
+        await call.message.answer('Do you want buy a {} for {}$'.format(res[0][3], res[0][4]),
+                                        reply_markup=await accept_buying((callback_data.get('products'))))
+
+    else:
+        img = InputFile('media/{}'.format(res[0][5]))
+        await call.message.answer_photo(img,'Do you want buy a {} for {}$'.format(res[0][3],res[0][4]),reply_markup=await accept_buying((callback_data.get('products'))))
 
 
 
